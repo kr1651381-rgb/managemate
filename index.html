@@ -75,7 +75,6 @@
 </head>
 <body>
 
-  <!-- Onboarding Modal -->
   <div id="onboarding-modal" class="modal-backdrop hidden">
     <div class="modal-box">
       <span class="badge">Personalize Your Path</span>
@@ -88,27 +87,23 @@
           <option value="Independent Lifelong Learner">Independent Lifelong Learner</option>
           <option value="Graduate / Exam Researcher">Graduate / Competitive Exam Researcher</option>
         </select>
-
         <label>2. Your biggest study obstacle?</label>
         <select id="q-challenge">
           <option value="Procrastination & Focus">Procrastination & Maintaining Focus</option>
           <option value="Information Retention">Remembering What I Study (Retention)</option>
           <option value="Time & Energy Management">Time & Study Schedule Management</option>
         </select>
-
         <label>3. Daily focused study goal?</label>
         <select id="q-goal">
           <option value="15">15 mins / day</option>
           <option value="30">30 mins / day</option>
           <option value="60">60 mins / day</option>
         </select>
-
         <button type="submit" class="btn-primary" style="width:100%; padding:12px;">Build My Study Plan</button>
       </form>
     </div>
   </div>
 
-  <!-- Template Modal -->
   <div id="template-modal" class="modal-backdrop hidden">
     <div class="modal-box" style="max-width:580px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -123,7 +118,6 @@
     </div>
   </div>
 
-  <!-- Desktop Sidebar -->
   <aside class="sidebar">
     <div class="brand">
       <div class="logo-box">M</div>
@@ -146,7 +140,6 @@
     </div>
   </aside>
 
-  <!-- Mobile Bottom Nav -->
   <nav class="mobile-nav">
     <button class="nav-btn" data-tab="dashboard" onclick="switchTab('dashboard')"><span>📊</span>Home</button>
     <button class="nav-btn" data-tab="curriculum" onclick="switchTab('curriculum')"><span>📖</span>Lessons</button>
@@ -155,5 +148,9 @@
     <button class="nav-btn" data-tab="toolkits" onclick="switchTab('toolkits')"><span>🧰</span>Toolkits</button>
   </nav>
 
-  <!-- Main Content -->
   <main class="main">
+    <div class="container">
+
+      <section id="tab-dashboard" class="tab-section">
+        <div class="card">
+          
