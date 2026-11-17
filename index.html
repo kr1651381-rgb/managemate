@@ -3,168 +3,160 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ManageMate — Personal Self-Study & Learning Platform</title>
-  <script src="https://tailwindcss.com"></script>
-  <script src="https://unpkg.com"></script>
+  <title>ManageMate — Personal Self-Study Platform</title>
   <style>
-    @import url('https://googleapis.com');
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #f8fafc;
-      color: #334155;
+    :root {
+      --navy: #0f172a;
+      --slate: #334155;
+      --muted: #64748b;
+      --bg: #f8fafc;
+      --white: #ffffff;
+      --border: #e2e8f0;
+      --emerald: #10b981;
+      --emerald-dark: #059669;
+      --emerald-bg: #ecfdf5;
     }
-    .navy-text { color: #0f172a; }
-    .navy-bg { background-color: #0f172a; }
-    .emerald-accent { background-color: #10b981; }
-    .emerald-text { color: #059669; }
-    
-    /* 3D Flashcard Flip */
-    .perspective-1000 { perspective: 1000px; }
-    .transform-style-3d { transform-style: preserve-3d; }
-    .backface-hidden { backface-visibility: hidden; }
-    .rotate-y-180 { transform: rotateY(180deg); }
-    .flashcard-inner {
-      transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--slate); display: flex; min-height: 100vh; padding-bottom: 72px; }
+    h1, h2, h3, h4 { color: var(--navy); }
+    button { cursor: pointer; border: none; background: none; font: inherit; }
+
+    /* Sidebar & Mobile Nav */
+    .sidebar { display: none; width: 250px; background: var(--white); border-right: 1px solid var(--border); flex-direction: column; position: fixed; inset: 0 auto 0 0; z-index: 20; }
+    .brand { padding: 22px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
+    .logo-box { width: 36px; height: 36px; border-radius: 10px; background: var(--navy); color: var(--white); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+    .nav-list { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .nav-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--slate); text-align: left; transition: 0.2s; }
+    .nav-btn:hover { background: #f1f5f9; }
+    .nav-btn.active { background: var(--emerald-bg); color: var(--emerald-dark); font-weight: 600; }
+
+    .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 4px; z-index: 30; }
+    .mobile-nav .nav-btn { flex-direction: column; gap: 3px; padding: 6px 10px; font-size: 11px; align-items: center; }
+
+    @media (min-width: 768px) {
+      body { padding-bottom: 0; }
+      .sidebar { display: flex; }
+      .mobile-nav { display: none; }
+      .main { margin-left: 250px; }
     }
+
+    /* Main Layout */
+    .main { flex: 1; width: 100%; }
+    .container { max-width: 960px; margin: 0 auto; padding: 20px; }
+    .hidden { display: none !important; }
+    .card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); margin-bottom: 18px; }
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--emerald-bg); color: var(--emerald-dark); margin-bottom: 8px; }
+    .btn-primary { background: var(--navy); color: var(--white); padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; transition: 0.2s; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-emerald { background: var(--emerald); color: var(--white); padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+    .btn-emerald:hover { background: var(--emerald-dark); }
+    .btn-outline { border: 1px solid var(--border); background: var(--white); color: var(--navy); padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+    .btn-outline:hover { background: #f8fafc; }
+
+    /* Progress & Grid */
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    .progress-track { width: 100%; height: 9px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; background: var(--emerald); border-radius: 99px; transition: width 0.4s ease; }
+
+    /* Forms & Inputs */
+    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; margin-top: 6px; margin-bottom: 14px; background: var(--white); color: var(--navy); }
+    label { font-size: 13px; font-weight: 600; color: var(--navy); display: block; }
+
+    /* Flashcards */
+    .flashcard { min-height: 220px; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; cursor: pointer; transition: 0.25s; border: 1px solid var(--border); }
+    .flashcard.front { background: var(--white); color: var(--navy); }
+    .flashcard.back { background: var(--navy); color: var(--white); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .pill { padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--white); color: var(--slate); }
+    .pill.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+    /* Quiz & Scenarios */
+    .option-btn { width: 100%; text-align: left; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); font-size: 13px; margin-top: 8px; transition: 0.15s; }
+    .option-btn:hover { background: #f8fafc; }
+    .option-btn.correct { background: #ecfdf5; border-color: #10b981; color: #065f46; font-weight: 600; }
+    .option-btn.wrong { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
+    .feedback-box { margin-top: 10px; padding: 12px; border-radius: 10px; font-size: 13px; background: #f1f5f9; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+    .modal-box { background: var(--white); border-radius: 18px; max-width: 500px; width: 100%; padding: 24px; max-height: 88vh; overflow-y: auto; }
+    pre { background: #f8fafc; border: 1px solid var(--border); padding: 14px; border-radius: 10px; font-size: 12px; white-space: pre-wrap; margin: 12px 0; font-family: monospace; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+<body>
 
-  <!-- Onboarding / Assessment Modal -->
-  <div id="onboarding-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100">
-      <div class="flex items-center gap-2.5 mb-2">
-        <div class="w-8 h-8 rounded-lg navy-bg text-white flex items-center justify-center font-bold">M</div>
-        <span class="text-sm font-semibold uppercase tracking-wider text-emerald-600">Personalize Your Path</span>
-      </div>
-      <h2 class="text-2xl font-bold navy-text mb-2">Welcome to ManageMate</h2>
-      <p class="text-slate-500 text-sm mb-6">Answer 3 quick questions to tailor your self-study dashboard and recommended modules.</p>
+  <!-- Onboarding Modal -->
+  <div id="onboarding-modal" class="modal-backdrop hidden">
+    <div class="modal-box">
+      <span class="badge">Personalize Your Path</span>
+      <h2 style="font-size:22px; margin-bottom:6px;">Welcome to ManageMate</h2>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:18px;">Answer 3 quick questions to tailor your self-study dashboard.</p>
+      <form id="onboarding-form">
+        <label>1. Your current learning stage?</label>
+        <select id="q-role">
+          <option value="High School / Undergrad Student">High School / Undergrad Student</option>
+          <option value="Independent Lifelong Learner">Independent Lifelong Learner</option>
+          <option value="Graduate / Exam Researcher">Graduate / Competitive Exam Researcher</option>
+        </select>
 
-      <form id="onboarding-form" class="space-y-5">
-        <div>
-          <label class="block text-sm font-semibold navy-text mb-1.5">1. What best describes your current learning stage?</label>
-          <select id="q-role" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-            <option value="High School / Undergrad Student">High School / Undergrad Student</option>
-            <option value="Independent Lifelong Learner">Independent Lifelong Learner</option>
-            <option value="Graduate / Exam Researcher">Graduate / Competitive Exam Researcher</option>
-          </select>
-        </div>
+        <label>2. Your biggest study obstacle?</label>
+        <select id="q-challenge">
+          <option value="Procrastination & Focus">Procrastination & Maintaining Focus</option>
+          <option value="Information Retention">Remembering What I Study (Retention)</option>
+          <option value="Time & Energy Management">Time & Study Schedule Management</option>
+        </select>
 
-        <div>
-          <label class="block text-sm font-semibold navy-text mb-1.5">2. What is your biggest study obstacle right now?</label>
-          <select id="q-challenge" class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500">
-            <option value="Procrastination & Focus">Procrastination & Maintaining Focus</option>
-            <option value="Information Retention">Remembering What I Study (Retention)</option>
-            <option value="Time & Energy Management">Time & Study Schedule Management</option>
-          </select>
-        </div>
+        <label>3. Daily focused study goal?</label>
+        <select id="q-goal">
+          <option value="15">15 mins / day</option>
+          <option value="30">30 mins / day</option>
+          <option value="60">60 mins / day</option>
+        </select>
 
-        <div>
-          <label class="block text-sm font-semibold navy-text mb-1.5">3. What is your daily focused study goal?</label>
-          <div class="grid grid-cols-3 gap-3">
-            <label class="cursor-pointer">
-              <input type="radio" name="goal" value="15" class="peer sr-only" checked />
-              <div class="text-center py-2.5 rounded-xl border border-slate-200 text-sm font-medium peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700">15 mins/day</div>
-            </label>
-            <label class="cursor-pointer">
-              <input type="radio" name="goal" value="30" class="peer sr-only" />
-              <div class="text-center py-2.5 rounded-xl border border-slate-200 text-sm font-medium peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700">30 mins/day</div>
-            </label>
-            <label class="cursor-pointer">
-              <input type="radio" name="goal" value="60" class="peer sr-only" />
-              <div class="text-center py-2.5 rounded-xl border border-slate-200 text-sm font-medium peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700">60 mins/day</div>
-            </label>
-          </div>
-        </div>
-
-        <button type="submit" class="w-full py-3 rounded-xl navy-bg text-white font-semibold text-sm hover:bg-slate-800 transition shadow-sm">
-          Build My Study Plan
-        </button>
+        <button type="submit" class="btn-primary" style="width:100%; padding:12px;">Build My Study Plan</button>
       </form>
     </div>
   </div>
 
   <!-- Template Preview Modal -->
-  <div id="template-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 flex flex-col max-h-[85vh]">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <h3 id="modal-template-title" class="text-lg font-bold navy-text">Template Preview</h3>
-        <button onclick="closeTemplateModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
+  <div id="template-modal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:600px;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 id="modal-title">Template Preview</h3>
+        <button onclick="closeTemplateModal()" class="btn-outline" style="padding:4px 10px;">✕</button>
       </div>
-      <pre id="modal-template-content" class="mt-4 p-4 bg-slate-50 rounded-xl text-xs md:text-sm text-slate-700 whitespace-pre-wrap font-mono overflow-y-auto flex-1 border border-slate-200"></pre>
-      <div class="mt-4 flex justify-end gap-3">
-        <button onclick="closeTemplateModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50">Close</button>
-        <button id="modal-copy-btn" class="px-4 py-2 rounded-xl emerald-accent text-white text-sm font-semibold hover:bg-emerald-600 flex items-center gap-2">
-          <i data-lucide="copy" class="w-4 h-4"></i> Copy to Clipboard
-        </button>
+      <pre id="modal-body"></pre>
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button onclick="closeTemplateModal()" class="btn-outline">Close</button>
+        <button id="modal-copy-btn" class="btn-emerald">Copy Template</button>
       </div>
     </div>
   </div>
 
-  <!-- Desktop Left Sidebar -->
-  <aside class="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 bg-white border-r border-slate-200 z-30">
-    <div class="p-6 flex items-center gap-3 border-b border-slate-100">
-      <div class="w-9 h-9 rounded-xl navy-bg text-white flex items-center justify-center font-bold text-lg shadow-sm">M</div>
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo-box">M</div>
       <div>
-        <span class="font-bold text-lg navy-text tracking-tight block leading-none">ManageMate</span>
-        <span class="text-[11px] font-medium text-emerald-600 uppercase tracking-wider">Self-Study OS</span>
+        <div style="font-weight:700; color:var(--navy); font-size:17px;">ManageMate</div>
+        <div style="font-size:11px; color:var(--emerald-dark); font-weight:600;">SELF-STUDY OS</div>
       </div>
     </div>
-
-    <nav class="flex-1 p-4 space-y-1.5" id="desktop-nav">
-      <button data-tab="dashboard" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
-        <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
-      </button>
-      <button data-tab="curriculum" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
-        <i data-lucide="book-open" class="w-4 h-4"></i> Curriculum
-      </button>
-      <button data-tab="flashcards" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
-        <i data-lucide="layers" class="w-4 h-4"></i> Flashcards
-      </button>
-      <button data-tab="casestudies" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
-        <i data-lucide="compass" class="w-4 h-4"></i> Study Scenarios
-      </button>
-      <button data-tab="toolkits" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition">
-        <i data-lucide="folder-kanban" class="w-4 h-4"></i> Study Toolkits
-      </button>
-    </nav>
-
-    <div class="p-4 m-4 rounded-xl bg-slate-50 border border-slate-200/80">
-      <div class="flex items-center justify-between text-xs font-semibold navy-text mb-1">
-        <span>Study Profile</span>
-        <button onclick="openOnboarding()" class="text-emerald-600 hover:underline">Edit</button>
-      </div>
-      <p id="sidebar-role" class="text-xs text-slate-500 truncate">Independent Learner</p>
-      <p id="sidebar-goal" class="text-xs text-slate-400 mt-0.5">Goal: 15 mins/day</p>
+    <div class="nav-list">
+      <button class="nav-btn" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+      <button class="nav-btn" data-tab="curriculum" onclick="switchTab('curriculum')">📖 Curriculum</button>
+      <button class="nav-btn" data-tab="flashcards" onclick="switchTab('flashcards')">🗂️ Flashcards</button>
+      <button class="nav-btn" data-tab="scenarios" onclick="switchTab('scenarios')">🧭 Study Scenarios</button>
+      <button class="nav-btn" data-tab="toolkits" onclick="switchTab('toolkits')">🧰 Study Toolkits</button>
+    </div>
+    <div style="padding:16px; border-top:1px solid var(--border); font-size:12px;">
+      <div style="font-weight:600; color:var(--navy);" id="side-role">Independent Learner</div>
+      <div style="color:var(--muted); margin:4px 0 8px;" id="side-goal">Goal: 15 mins/day</div>
+      <button onclick="openOnboarding()" style="color:var(--emerald-dark); font-weight:600;">Edit Study Profile</button>
     </div>
   </aside>
 
-  <!-- Mobile Bottom Navigation -->
-  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 flex justify-around py-2 px-1 z-40" id="mobile-nav">
-    <button data-tab="dashboard" class="nav-btn flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium">
-      <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Home
-    </button>
-    <button data-tab="curriculum" class="nav-btn flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium">
-      <i data-lucide="book-open" class="w-5 h-5"></i> Lessons
-    </button>
-    <button data-tab="flashcards" class="nav-btn flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium">
-      <i data-lucide="layers" class="w-5 h-5"></i> Cards
-    </button>
-    <button data-tab="casestudies" class="nav-btn flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium">
-      <i data-lucide="compass" class="w-5 h-5"></i> Scenarios
-    </button>
-    <button data-tab="toolkits" class="nav-btn flex flex-col items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium">
-      <i data-lucide="folder-kanban" class="w-5 h-5"></i> Toolkits
-    </button>
-  </nav>
-
-  <!-- Main Content Area -->
-  <main class="flex-1 md:pl-64">
-    <div class="max-w-5xl mx-auto p-4 sm:p-6 md:p-8">
-
-      <!-- TAB 1: DASHBOARD -->
-      <section id="tab-dashboard" class="tab-panel space-y-6">
-        <!-- Welcome Banner -->
-        
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <button class="nav-btn" data-tab="dashboard" onclick="switchTab('dashboard')"><span>📊</span>Home</button>
