@@ -1,156 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ManageMate — Personal Self-Study Platform</title>
-  <style>
-    :root {
-      --navy: #0f172a;
-      --slate: #334155;
-      --muted: #64748b;
-      --bg: #f8fafc;
-      --white: #ffffff;
-      --border: #e2e8f0;
-      --emerald: #10b981;
-      --emerald-dark: #059669;
-      --emerald-bg: #ecfdf5;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--slate); display: flex; min-height: 100vh; padding-bottom: 72px; }
-    h1, h2, h3 { color: var(--navy); }
-    button { cursor: pointer; border: none; background: none; font: inherit; }
-
-    .sidebar { display: none; width: 240px; background: var(--white); border-right: 1px solid var(--border); flex-direction: column; position: fixed; inset: 0 auto 0 0; z-index: 20; }
-    .brand { padding: 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); }
-    .logo-box { width: 36px; height: 36px; border-radius: 10px; background: var(--navy); color: var(--white); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
-    .nav-list { padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-    .nav-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--slate); text-align: left; }
-    .nav-btn:hover { background: #f1f5f9; }
-    .nav-btn.active { background: var(--emerald-bg); color: var(--emerald-dark); font-weight: 600; }
-
-    .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 4px; z-index: 30; }
-    .mobile-nav .nav-btn { flex-direction: column; gap: 3px; padding: 6px 8px; font-size: 11px; align-items: center; }
-
-    @media (min-width: 768px) {
-      body { padding-bottom: 0; }
-      .sidebar { display: flex; }
-      .mobile-nav { display: none; }
-      .main { margin-left: 240px; }
-    }
-
-    .main { flex: 1; width: 100%; }
-    .container { max-width: 920px; margin: 0 auto; padding: 20px; }
-    .hidden { display: none !important; }
-    .card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); margin-bottom: 16px; }
-    .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; background: var(--emerald-bg); color: var(--emerald-dark); margin-bottom: 8px; }
-    .btn-primary { background: var(--navy); color: var(--white); padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; }
-    .btn-emerald { background: var(--emerald); color: var(--white); padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 600; }
-    .btn-outline { border: 1px solid var(--border); background: var(--white); color: var(--navy); padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
-    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
-    .progress-track { width: 100%; height: 9px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-top: 8px; }
-    .progress-fill { height: 100%; background: var(--emerald); border-radius: 99px; transition: width 0.3s ease; }
-
-    input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 14px; margin-top: 6px; margin-bottom: 14px; background: var(--white); color: var(--navy); }
-    label { font-size: 13px; font-weight: 600; color: var(--navy); display: block; }
-
-    .flashcard { min-height: 210px; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; cursor: pointer; border: 1px solid var(--border); }
-    .flashcard.front { background: var(--white); color: var(--navy); }
-    .flashcard.back { background: var(--navy); color: var(--white); }
-    .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-    .pill { padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--white); color: var(--slate); }
-    .pill.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
-
-    .option-btn { width: 100%; text-align: left; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); font-size: 13px; margin-top: 8px; }
-    .option-btn.correct { background: #ecfdf5; border-color: #10b981; color: #065f46; font-weight: 600; }
-    .option-btn.wrong { background: #fef2f2; border-color: #ef4444; color: #991b1b; }
-    .feedback-box { margin-top: 10px; padding: 12px; border-radius: 10px; font-size: 13px; background: #f1f5f9; }
-
-    .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
-    .modal-box { background: var(--white); border-radius: 18px; max-width: 500px; width: 100%; padding: 22px; max-height: 88vh; overflow-y: auto; }
-    pre { background: #f8fafc; border: 1px solid var(--border); padding: 12px; border-radius: 10px; font-size: 12px; white-space: pre-wrap; margin: 12px 0; font-family: monospace; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ManageMate Self-Study</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
+body{background:#f8fafc;color:#1e293b;padding-bottom:75px}
+.top{background:#0f172a;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.wrap{max-width:850px;margin:16px auto;padding:0 14px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;margin-bottom:14px}
+.tag{display:inline-block;background:#ecfdf5;color:#059669;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:8px}
+h2{font-size:19px;color:#0f172a;margin-bottom:6px}
+p{font-size:14px;line-height:1.5;color:#475569;margin-bottom:10px}
+.btn{background:#0f172a;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-g{background:#10b981;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-o{background:#fff;color:#0f172a;border:1px solid #cbd5e1;padding:9px 14px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer}
+.bar{height:8px;background:#e2e8f0;border-radius:10px;overflow:hidden;margin:8px 0}
+.fill{height:100%;background:#10b981;transition:.3s}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e2e8f0;display:flex;justify-content:space-around;padding:8px 0;z-index:10}
+.nav button{background:none;border:none;font-size:11px;font-weight:600;color:#64748b;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.nav button.act{color:#059669}
+.hide{display:none!important}
+.fcard{background:#fff;border:2px solid #0f172a;border-radius:16px;padding:28px 20px;min-height:190px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;margin:12px 0}
+.fcard.ans{background:#0f172a;color:#fff}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pill{padding:6px 12px;border-radius:20px;border:1px solid #cbd5e1;background:#fff;font-size:12px;font-weight:600;cursor:pointer}
+.pill.act{background:#0f172a;color:#fff;border-color:#0f172a}
+input,select,textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;margin:6px 0 12px;font-size:14px}
+.opt{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;margin-top:6px;font-size:13px;cursor:pointer}
+.opt.ok{background:#ecfdf5;border-color:#10b981;color:#065f46;font-weight:600}
+.opt.no{background:#fef2f2;border-color:#ef4444;color:#991b1b}
+pre{background:#f1f5f9;padding:12px;border-radius:10px;font-size:12px;white-space:pre-wrap;margin-top:8px}
+</style>
 </head>
 <body>
 
-  <div id="onboarding-modal" class="modal-backdrop hidden">
-    <div class="modal-box">
-      <span class="badge">Personalize Your Path</span>
-      <h2 style="font-size:21px; margin-bottom:6px;">Welcome to ManageMate</h2>
-      <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">Answer 3 quick questions to tailor your self-study dashboard.</p>
-      <form id="onboarding-form">
-        <label>1. Your current learning stage?</label>
-        <select id="q-role">
-          <option value="High School / Undergrad Student">High School / Undergrad Student</option>
-          <option value="Independent Lifelong Learner">Independent Lifelong Learner</option>
-          <option value="Graduate / Exam Researcher">Graduate / Competitive Exam Researcher</option>
-        </select>
-        <label>2. Your biggest study obstacle?</label>
-        <select id="q-challenge">
-          <option value="Procrastination & Focus">Procrastination & Maintaining Focus</option>
-          <option value="Information Retention">Remembering What I Study (Retention)</option>
-          <option value="Time & Energy Management">Time & Study Schedule Management</option>
-        </select>
-        <label>3. Daily focused study goal?</label>
-        <select id="q-goal">
-          <option value="15">15 mins / day</option>
-          <option value="30">30 mins / day</option>
-          <option value="60">60 mins / day</option>
-        </select>
-        <button type="submit" class="btn-primary" style="width:100%; padding:12px;">Build My Study Plan</button>
-      </form>
+<div class="top">
+  <div><b>ManageMate</b> <span style="font-size:11px;color:#34d399;margin-left:6px">SELF-STUDY</span></div>
+  <button class="btn-g" style="padding:6px 12px;font-size:12px" onclick="show('setup')">⚙️ Goal</button>
+</div>
+
+<div class="wrap">
+  <div id="p-setup" class="card hide">
+    <span class="tag">Personalize Study Plan</span>
+    <h2>Set Your Self-Study Goal</h2>
+    <label>Learner Level</label>
+    <select id="s-role"><option>Student (School / College)</option><option>Independent Lifelong Learner</option><option>Competitive Exam Aspirant</option></select>
+    <label>Biggest Study Challenge</label>
+    <select id="s-chal"><option>Procrastination & Focus</option><option>Remembering Concepts (Retention)</option><option>Time Management</option></select>
+    <label>Daily Study Target</label>
+    <select id="s-goal"><option value="15">15 mins / day</option><option value="30">30 mins / day</option><option value="60">60 mins / day</option></select>
+    <button class="btn" style="width:100%" onclick="saveSetup()">Save & Start Learning</button>
+  </div>
+
+  <div id="p-home">
+    <div class="card">
+      <span class="tag">🔥 4-Day Study Streak</span>
+      <h2 id="h-title">Welcome, Self-Learner!</h2>
+      <p id="h-rec"></p>
+      <div style="font-size:13px;font-weight:600">Overall Mastery: <span id="h-pct" style="color:#059669">45%</span></div>
+      <div class="bar"><div id="h-bar" class="fill" style="width:45%"></div></div>
+      <div id="h-sub" style="font-size:12px;color:#64748b"></div>
+    </div>
+    <div class="card">
+      <span class="tag">Next Lesson</span>
+      <h2 id="h-next"></h2>
+      <p id="h-nextd"></p>
+      <button class="btn" onclick="show('lessons')">Start Lesson →</button>
+    </div>
+    <div class="card">
+      <h2>Skill Mastery Pillars</h2>
+      <div id="h-pillars"></div>
     </div>
   </div>
 
-  <div id="template-modal" class="modal-backdrop hidden">
-    <div class="modal-box" style="max-width:580px;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 id="modal-title">Template Preview</h3>
-        <button onclick="closeTemplateModal()" class="btn-outline" style="padding:4px 10px;">✕</button>
-      </div>
-      <pre id="modal-body"></pre>
-      <div style="display:flex; justify-content:flex-end; gap:10px;">
-        <button onclick="closeTemplateModal()" class="btn-outline">Close</button>
-        <button id="modal-copy-btn" class="btn-emerald">Copy Template</button>
-      </div>
+  <div id="p-lessons" class="hide">
+    <div id="l-pills" class="pills"></div>
+    <div id="l-body" class="card"></div>
+  </div>
+
+  <div id="p-cards" class="hide">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <h2>Subject Flashcards</h2>
+      <button class="btn" onclick="document.getElementById('c-add').classList.toggle('hide')">+ New Card</button>
+    </div>
+    <div id="c-add" class="card hide">
+      <input id="nc-sub" placeholder="Subject (e.g. Science, History)">
+      <input id="nc-q" placeholder="Question (Front)">
+      <input id="nc-a" placeholder="Answer (Back)">
+      <button class="btn-g" onclick="addCard()">Save Flashcard</button>
+    </div>
+    <div id="c-decks" class="pills"></div>
+    <div style="font-size:12px;color:#64748b;display:flex;justify-content:space-between">
+      <span id="c-cnt"></span><span id="c-st"></span>
+    </div>
+    <div id="c-box" class="fcard" onclick="flip()">
+      <div id="c-tag" style="font-size:12px;opacity:.7;margin-bottom:10px"></div>
+      <div id="c-txt" style="font-size:18px;font-weight:600"></div>
+      <div style="font-size:11px;opacity:.6;margin-top:14px">(Tap card to flip)</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:8px">
+      <div><button class="btn-o" onclick="step(-1)">← Prev</button> <button class="btn-o" onclick="step(1)">Next →</button></div>
+      <div><button class="btn-o" onclick="rate('Review')">Review</button> <button class="btn-g" onclick="rate('Mastered')">✓ Mastered</button></div>
     </div>
   </div>
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo-box">M</div>
-      <div>
-        <div style="font-weight:700; color:var(--navy); font-size:17px;">ManageMate</div>
-        <div style="font-size:11px; color:var(--emerald-dark); font-weight:600;">SELF-STUDY OS</div>
-      </div>
-    </div>
-    <div class="nav-list">
-      <button class="nav-btn" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
-      <button class="nav-btn" data-tab="curriculum" onclick="switchTab('curriculum')">📖 Curriculum</button>
-      <button class="nav-btn" data-tab="flashcards" onclick="switchTab('flashcards')">🗂️ Flashcards</button>
-      <button class="nav-btn" data-tab="scenarios" onclick="switchTab('scenarios')">🧭 Study Scenarios</button>
-      <button class="nav-btn" data-tab="toolkits" onclick="switchTab('toolkits')">🧰 Study Toolkits</button>
-    </div>
-    <div style="padding:16px; border-top:1px solid var(--border); font-size:12px;">
-      <div style="font-weight:600; color:var(--navy);" id="side-role">Independent Learner</div>
-      <div style="color:var(--muted); margin:4px 0 8px;" id="side-goal">Goal: 15 mins/day</div>
-      <button onclick="openOnboarding()" style="color:var(--emerald-dark); font-weight:600;">Edit Study Profile</button>
-    </div>
-  </aside>
+  <div id="p-scen" class="hide"></div>
 
-  <nav class="mobile-nav">
-    <button class="nav-btn" data-tab="dashboard" onclick="switchTab('dashboard')"><span>📊</span>Home</button>
-    <button class="nav-btn" data-tab="curriculum" onclick="switchTab('curriculum')"><span>📖</span>Lessons</button>
-    <button class="nav-btn" data-tab="flashcards" onclick="switchTab('flashcards')"><span>🗂️</span>Cards</button>
-    <button class="nav-btn" data-tab="scenarios" onclick="switchTab('scenarios')"><span>🧭</span>Scenarios</button>
-    <button class="nav-btn" data-tab="toolkits" onclick="switchTab('toolkits')"><span>🧰</span>Toolkits</button>
-  </nav>
+  <div id="p-tools" class="hide"></div>
+</div>
 
-  <main class="main">
-    <div class="container">
+<div class="nav">
+  <button id="n-home" class="act" onclick="show('home')"><span>📊</span>Home</button>
+  <button id="n-lessons" onclick="show('lessons')"><span>📖</span>Lessons</button>
+  <button id="n-cards" onclick="show('cards')"><span>🗂️</span>Cards</button>
+  <button id="n-scen" onclick="show('scen')"><span>🧭</span>Scenarios</button>
+  <button id="n-tools" onclick="show('tools')"><span>🧰</span>Toolkits</button>
+</div>
 
-      <section id="tab-dashboard" class="tab-section">
-        <div class="card">
-          
+<script>
+const L=[
+{id:'l1',t:'Feynman Technique & Active Recall',p:'Active Recall',d:'Explain concepts in plain words on a blank page to expose knowledge gaps.',b:'Re-reading notes creates false familiarity. Instead, close your book, write the topic on blank paper, and explain it as if teaching a beginner. Wherever you get stuck, go back and review only that gap.',q:[{q:'Why does re-reading fail?',o:['Creates false familiarity without testing memory','Takes too much ink'],a:0},{q:'First step of Feynman Technique?',o:['Explain concept simply on blank paper','Highlight every line'],a:0}]},
+{id:'l2',t:'Spaced Repetition System',p:'Memory & Retention',d:'Review topics on Day 1, 3, 7, and 21 right before forgetting.',b:'Memory drops sharply within 48 hours without review. Reviewing at expanding intervals (Day 1, 3, 7, 21) forces effortful retrieval and locks facts into long-term memory.',q:[{q:'Best time to review a concept?',o:['Right before forgetting at spaced intervals','All in one 6-hour night'],a:0},{q:'What strengthens neural memory?',o:['Effortful recall','Passive skimming'],a:0}]},
+{id:'l3',t:'Deep Work & 5-Minute Rule',p:'Focus & Discipline',d:'Beat procrastination by starting with a tiny 5-minute distraction-free sprint.',b:'Procrastination comes from overwhelm. Promise yourself just 5 minutes of focused study with your phone in another room. Once started, momentum carries you forward.',q:[{q:'How does the 5-Minute Rule help?',o:['Lowers starting resistance','Limits study to 5 mins total'],a:0},{q:'Where should your phone be?',o:['In another room','Face-down on your desk'],a:0}]}
+];
+const C0=[
+{id:1,s:'Computer Science',q:'Time complexity of Binary Search?',a:'O(log n) — halves search space each step.',st:'New'},
+{id:2,s:'Computer Science',q:'Stack vs Queue?',a:'Stack = LIFO; Queue = FIFO.',st:'New'},
+{id:3,s:'Psychology',q:'What is the Testing Effect?',a:'Retrieving from memory boosts retention more than re-reading.',st:'New'},
+{id:4,s:'Economics',q:'What is Opportunity Cost?',a:'Value of the next-best alternative given up.',st:'New'},
+{id:5,s:'History',q:'What sparked 15th-century European literacy?',a:'Gutenberg movable-type printing press (c. 1440).',st:'New'}
+];
+const SC=[
+{id:'s1',t:'Overwhelmed 5 Days Before Exam',c:'Syllabus feels huge and you keep avoiding starting.',o:[{t:'List top 5 core topics & do one 25-min timer now',r:'Best! Triage + short sprint breaks emotional resistance.'},{t:'Pull an 8-hour all-nighter',r:'High burnout and poor memory retention.'}]},
+{id:'s2',t:'12 Tabs Open & Zero Clarity',c:'You watched 4 videos but cannot explain the topic.',o:[{t:'Close all tabs & write a summary from memory',r:'Best! Closed-book recall reveals real understanding.'},{t:'Watch 2 more overview videos',r:'Collector’s fallacy—collecting tutorials is not learning.'}]}
+];
+const TK=[
+{t:'Pomodoro Deep Work Sheet',c:'Target: _________\n[ ] Phone in another room\n[ ] 25m Focus -> 5m Break\n3 Key Takeaways:\n1.\n2.\n3.'},
+{t:'Cornell Active-Recall Notes',c:'CUE QUESTIONS | NOTES\nQ1:           | -\nQ2:           | -\n3-Sentence Summary:\n1.\n2.\n3.'},
+  
